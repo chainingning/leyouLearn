@@ -6,7 +6,7 @@ spring:
     username: root
     password: 123456
   application:
-    name: user-service
+    name: service-provider
 mybatis:
   type-aliases-package: com.chai.service.pojo
 eureka:
