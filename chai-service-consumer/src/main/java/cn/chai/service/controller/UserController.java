@@ -28,15 +28,16 @@ public class UserController {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Autowired
-    private DiscoveryClient discoveryClient;
+    //包含所有的服务提供方信息
+//    @Autowired
+//    private DiscoveryClient discoveryClient;
 
     @GetMapping
     @ResponseBody
     public User queryUserById(@RequestParam("id")Long id){
-        List<ServiceInstance> instances = discoveryClient.getInstances("service-provider");
-        ServiceInstance serviceInstance = instances.get(0);
+//        List<ServiceInstance> instances = discoveryClient.getInstances("service-provider");
+//        ServiceInstance serviceInstance = instances.get(0);
 
-        return this.restTemplate.getForObject("http://"+serviceInstance.getHost()+":"+serviceInstance.getPort()+"/user/"+id,User.class);
+        return this.restTemplate.getForObject("http://service-provider/user/"+id,User.class);
     }
 }
