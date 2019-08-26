@@ -2,6 +2,7 @@ package cn.chai.service.controller;
 
 import cn.chai.service.pojo.User;
 import com.netflix.discovery.converters.Auto;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -34,10 +35,15 @@ public class UserController {
 
     @GetMapping
     @ResponseBody
-    public User queryUserById(@RequestParam("id")Long id){
+    @HystrixCommand(fallbackMethod = "queryUserByIdFallback")
+    public String queryUserById(@RequestParam("id")Long id){
 //        List<ServiceInstance> instances = discoveryClient.getInstances("service-provider");
 //        ServiceInstance serviceInstance = instances.get(0);
 
-        return this.restTemplate.getForObject("http://service-provider/user/"+id,User.class);
+        return this.restTemplate.getForObject("http://service-provider/user/"+id,String.class);
+    }
+
+    public String queryUserByIdFallback(Long id){
+        return "服务正忙，请稍后再试!";
     }
 }

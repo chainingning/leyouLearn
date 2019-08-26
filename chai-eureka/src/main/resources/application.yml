@@ -14,7 +14,7 @@ eureka:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
   server:
     enable-self-preservation: false # 关闭自我保护模式（缺省为打开）
-      eviction-interval-timer-in-ms: 1000 # 扫描失效服务的间隔时间（缺省为60*1000ms）
+    eviction-interval-timer-in-ms: 1000 # 扫描失效服务的间隔时间（缺省为60*1000ms）
 service-provider: #服务提供方的服务id
   ribbon:
     NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
