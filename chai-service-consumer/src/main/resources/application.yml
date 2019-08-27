@@ -17,3 +17,6 @@ hystrix:
         isolation:
           thread:
             timeoutInMillisecond: 6000 # 设置hystrix的超时时间为6000ms
+feign:
+  hystrix:
+    enabled: true #开启feign的熔断功能
