@@ -1,5 +1,6 @@
 package cn.chai.service.controller;
 
+import cn.chai.service.client.UserClient;
 import cn.chai.service.pojo.User;
 import com.netflix.discovery.converters.Auto;
 import com.netflix.hystrix.contrib.javanica.annotation.DefaultProperties;
@@ -28,8 +29,11 @@ import java.util.List;
 @DefaultProperties(defaultFallback = "defaultFallback" )
 public class UserController {
 
+//    @Autowired
+//    private RestTemplate restTemplate;
+
     @Autowired
-    private RestTemplate restTemplate;
+    private UserClient userClient;
 
     //包含所有的服务提供方信息
 //    @Autowired
@@ -44,7 +48,7 @@ public class UserController {
         }
 //        List<ServiceInstance> instances = discoveryClient.getInstances("service-provider");
 //        ServiceInstance serviceInstance = instances.get(0);
-        return this.restTemplate.getForObject("http://service-provider/user/"+id,String.class);
+        return this.userClient.queryUserById(id).toString();
     }
 
     public String queryUserByIdFallback(Long id){
