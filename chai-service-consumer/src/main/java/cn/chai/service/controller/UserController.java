@@ -39,9 +39,11 @@ public class UserController {
     @ResponseBody
     @HystrixCommand
     public String queryUserById(@RequestParam("id")Long id){
+        if (id==1) {
+            throw new RuntimeException();
+        }
 //        List<ServiceInstance> instances = discoveryClient.getInstances("service-provider");
 //        ServiceInstance serviceInstance = instances.get(0);
-
         return this.restTemplate.getForObject("http://service-provider/user/"+id,String.class);
     }
 
