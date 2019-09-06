@@ -2,6 +2,7 @@
   <v-card>
       <v-flex xs12 sm10>
         <v-tree url="/item/category/list"
+
                 :isEdit="isEdit"
                 @handleAdd="handleAdd"
                 @handleEdit="handleEdit"
@@ -13,7 +14,9 @@
 </template>
 
 <script>
+  import {treeData} from "../../mockDB.js";
   export default {
+
     name: "category",
     data() {
       return {
