@@ -1,6 +1,6 @@
 package com.leyou.upload.controller;
 
-import com.leyou.upload.controller.upload.service.UploadService;
+import com.leyou.upload.service.UploadService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.Container;
-
 /**
  * @ClassName UploadController
  * @Description: xxx
@@ -21,7 +19,7 @@ import java.awt.Container;
  * @Version V1.0
  **/
 @Controller
-@RequestMapping("uplaod")
+@RequestMapping("upload")
 public class UploadController {
     @Autowired
     private UploadService uploadService;

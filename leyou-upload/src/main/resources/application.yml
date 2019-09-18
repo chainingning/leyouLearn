@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8088 #8082端口被TIM给占用了
 spring:
   application:
     name: upload-service

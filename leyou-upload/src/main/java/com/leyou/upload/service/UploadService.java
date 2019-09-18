@@ -1,6 +1,5 @@
-package com.leyou.upload.controller.upload.service;
+package com.leyou.upload.service;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,7 @@ import java.util.List;
 @Service
 public class UploadService {
 
-    private static final List<String> CONTENT_TYPES = Arrays.asList("image/gif","image/jpeg");
+    private static final List<String> CONTENT_TYPES = Arrays.asList("image/gif","image/jpeg","image/png");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UploadService.class);
 
