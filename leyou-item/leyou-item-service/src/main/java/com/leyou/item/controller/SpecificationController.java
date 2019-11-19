@@ -44,13 +44,18 @@ public class SpecificationController {
     }
 
     /**
-     * 根据gid查询规格参数
+     * 根据gid查询规格参数,加上分页条件
      * @param gid
      * @return
      */
     @GetMapping("params")
-    public ResponseEntity<List<SpecParam>> queryParams(@RequestParam("gid")Long gid){
-        List<SpecParam> params = this.specificationService.queryParams(gid);
+    public ResponseEntity<List<SpecParam>> queryParams(
+            @RequestParam(value = "gid", required = false) Long gid,
+            @RequestParam(value = "cid", required = false) Long cid,
+            @RequestParam(value = "generic", required = false) Boolean generic,
+            @RequestParam(value = "searching", required = false) Boolean searching
+    ) {
+        List<SpecParam> params = this.specificationService.queryParams(gid,cid,generic, searching);
         if (CollectionUtils.isEmpty(params)) {
             return ResponseEntity.notFound().build();
         }
