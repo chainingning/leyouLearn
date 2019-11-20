@@ -57,11 +57,11 @@ public class GoodsService {
 
         //添加上下架的过滤条件
         if (saleable != null) {
-            criteria.andEqualTo("saleable",saleable);
+            criteria.andEqualTo("saleable", saleable);
         }
 
         //添加分页
-        PageHelper.startPage(page,rows);
+        PageHelper.startPage(page, rows);
 
         //执行查询，获取spu集合
         List<Spu> spus = this.spuMapper.selectByExample(example);
@@ -82,11 +82,12 @@ public class GoodsService {
         }).collect(Collectors.toList());
 
         //返回pageResult<spuBo>
-        return new PageResult<>(pageInfo.getTotal(),spuBos);
+        return new PageResult<>(pageInfo.getTotal(), spuBos);
     }
 
     /**
      * 新增商品
+     *
      * @param spuBo
      */
     @Transactional
@@ -122,5 +123,67 @@ public class GoodsService {
             stock.setStock(sku.getStock());
             this.stockMapper.insertSelective(stock);
         });
+    }
+
+    /**
+     * 根据spuId查询spuDtail
+     *
+     * @param spuId
+     * @return
+     */
+    public SpuDetail querySpuDetailBySpuId(Long spuId) {
+        return this.spuDetailMapper.selectByPrimaryKey(spuId);
+    }
+
+
+    /**
+     * 根据spuId查询sku的集合
+     *
+     * @param spuId
+     * @return
+     */
+    public List<Sku> querySkusBySpuId(Long spuId) {
+        Sku sku = new Sku();
+        sku.setSpuId(spuId);
+        List<Sku> skus = this.skuMapper.select(sku);
+        skus.forEach(s -> {
+            Stock stock = this.stockMapper.selectByPrimaryKey(s.getId());
+            s.setStock(stock.getStock());
+        });
+        return skus;
+    }
+
+    /**
+     * 商品更新
+     * @param spu
+     */
+    @Transactional
+    public void updateGoods(SpuBo spu) {
+
+        //根据spuId查询要删除的sku
+
+        Sku record = new Sku();
+        record.setSpuId(spu.getId());
+        List<Sku> skus = this.skuMapper.select(record);
+        skus.forEach(sku -> {
+            //删除stock
+            this.stockMapper.deleteByPrimaryKey(sku.getId());
+        });
+
+        //删除sku
+        Sku sku = new Sku();
+        sku.setSpuId(spu.getId());
+        this.skuMapper.delete(sku);
+
+        //新增sku
+        saveSkuAndStock(spu);
+        //新增stock
+        spu.setLastUpdateTime(new Date());
+        spu.setCreateTime(null);
+        spu.setValid(null);
+        spu.setSaleable(null);
+        this.spuMapper.updateByPrimaryKeySelective(spu);
+        //更新spu和spuDetail
+        this.spuDetailMapper.updateByPrimaryKeySelective(spu.getSpuDetail());
     }
 }

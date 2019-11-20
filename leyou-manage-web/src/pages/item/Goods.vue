@@ -154,6 +154,7 @@
         // 把oldBrand变为null
         this.oldGoods = {};
       },
+      //js是异步操作的，加上await就变成了同步的
       async editGoods(oldGoods) {
         // 发起请求，查询商品详情和skus
         oldGoods.spuDetail = await this.$http.loadData("/item/spu/detail/" + oldGoods.id);
