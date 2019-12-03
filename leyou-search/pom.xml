@@ -29,6 +29,16 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
     </dependency>
+    <!-- jdbc启动器 -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
+    <!-- mysql驱动 -->
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+    </dependency>
     <dependency>
         <groupId>com.leyou.item</groupId>
         <artifactId>leyou-item-interface</artifactId>
