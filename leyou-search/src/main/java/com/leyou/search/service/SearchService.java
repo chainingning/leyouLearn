@@ -157,6 +157,8 @@ public class SearchService {
         if (StringUtils.isBlank(request.getKey())) {
             return null;
         }
+        Integer page = request.getPage();
+        Integer size = request.getSize();
         //自定义查询构建起
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
         //添加查询条件
@@ -169,6 +171,11 @@ public class SearchService {
         //执行查询,获取结果集
         Page<Goods> goodsPage = this.goodsRepository.search(queryBuilder.build());
 
-        return new PageResult<>(goodsPage.getTotalElements(),goodsPage.getTotalPages(),goodsPage.getContent());
+        //5.封装结果并返回
+        //5.1总条数
+        Long total = goodsPage.getTotalElements();
+        int totalPage = (total.intValue() + size - 1) / size;
+        //5.2总页数
+        return new PageResult<>(total, totalPage, goodsPage.getContent());
     }
 }
