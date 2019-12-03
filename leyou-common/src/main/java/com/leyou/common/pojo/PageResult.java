@@ -25,6 +25,9 @@ public class PageResult<T> {
         this.items = items;
     }
 
+    public PageResult() {
+    }
+
     public Long getTatal() {
         return tatal;
     }

@@ -293,10 +293,10 @@
                         </li>
                     </ul>
                     <div class="top-pagination">
-                        <span>共 <i style="color: #222;">7600+</i> 商品</span>
-                        <span><i style="color: red;">2</i>/123</span>
-                        <a class="btn-arrow" @click="prevPage" href="#" style="display: inline-block">&lt;</a>
-                        <a class="btn-arrow" @click="nextPage" href="#" style="display: inline-block">&gt;</a>
+                        <span>共 <i style="color: #222;">{{total}}</i> 商品</span>
+                        <span><i style="color: red;">{{search.page}}</i>/{{totalPage}}</span>
+                        <a class="btn-arrow" @click="prevPage()" href="#" style="display: inline-block">&lt;</a>
+                        <a class="btn-arrow" @click="nextPage()" href="#" style="display: inline-block">&gt;</a>
                     </div>
                 </div>
             </div>
@@ -524,7 +524,7 @@
                     window.location.href = "http://www.leyou.com/search.html?" + ly.stringify(val);
                 }
             }
-        }
+        },
         components:{
             lyTop: () => import("./js/pages/top.js")
         }

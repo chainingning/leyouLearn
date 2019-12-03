@@ -13,19 +13,25 @@ import com.leyou.search.client.GoodsClient;
 import com.leyou.search.client.SpecificationClient;
 import com.leyou.search.pojo.Goods;
 import com.leyou.search.pojo.SearchRequest;
+import com.leyou.search.pojo.SearchResult;
 import com.leyou.search.repository.GoodsRepository;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.query.FetchSourceFilter;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName SearchService
@@ -153,7 +159,7 @@ public class SearchService {
         return result;
     }
 
-    public PageResult<Goods> search(SearchRequest request) {
+    public SearchResult search(SearchRequest request) {
         if (StringUtils.isBlank(request.getKey())) {
             return null;
         }
@@ -168,14 +174,68 @@ public class SearchService {
         //添加结果集过滤
         queryBuilder.withSourceFilter(new FetchSourceFilter(new String[]{"id","skus","subTitle"},null));
 
-        //执行查询,获取结果集
-        Page<Goods> goodsPage = this.goodsRepository.search(queryBuilder.build());
+        //添加分类和品牌的聚合
+        String categoryAggName = "categories";
+        String brandAggName = "brands";
+        queryBuilder.addAggregation(AggregationBuilders.terms(categoryAggName).field("cid3"));
+        queryBuilder.addAggregation(AggregationBuilders.terms(brandAggName).field("brandId"));
 
-        //5.封装结果并返回
-        //5.1总条数
-        Long total = goodsPage.getTotalElements();
-        int totalPage = (total.intValue() + size - 1) / size;
+
+        //执行查询,获取结果集
+        AggregatedPage<Goods> goodsPage = (AggregatedPage<Goods>)this.goodsRepository.search(queryBuilder.build());
+
+        //获取结果集并解析
+        List<Map<String, Object>> categories = getCategoryAggResult(goodsPage.getAggregation(categoryAggName));
+        List<Brand> brands = getBrandAggResult(goodsPage.getAggregation(brandAggName));
+
         //5.2总页数
-        return new PageResult<>(total, totalPage, goodsPage.getContent());
+        return new SearchResult(goodsPage.getTotalElements(),goodsPage.getTotalPages(),goodsPage.getContent(),categories, brands);
+    }
+
+
+    /**
+     * 解析品牌聚合结果集
+     * @param aggregation
+     * @return
+     */
+    private List<Brand> getBrandAggResult(Aggregation aggregation) {
+        // 处理聚合结果集
+        LongTerms terms = (LongTerms)aggregation;
+        // 获取所有的品牌id桶
+        List<LongTerms.Bucket> buckets = terms.getBuckets();
+        // 定义一个品牌集合，搜集所有的品牌对象
+        List<Brand> brands = new ArrayList<>();
+        // 解析所有的id桶，查询品牌
+        buckets.forEach(bucket -> {
+            Brand brand = this.brandClient.queryBrandById(bucket.getKeyAsNumber().longValue());
+            brands.add(brand);
+        });
+        return brands;
+        // 解析聚合结果集中的桶，把桶的集合转化成id的集合
+        // List<Long> brandIds = terms.getBuckets().stream().map(bucket -> bucket.getKeyAsNumber().longValue()).collect(Collectors.toList());
+        // 根据ids查询品牌
+        //return brandIds.stream().map(id -> this.brandClient.queryBrandById(id)).collect(Collectors.toList());
+        // return terms.getBuckets().stream().map(bucket -> this.brandClient.queryBrandById(bucket.getKeyAsNumber().longValue())).collect(Collectors.toList());
+    }
+
+    /**
+     * 解析分类
+     * @param aggregation
+     * @return
+     */
+    private List<Map<String, Object>> getCategoryAggResult(Aggregation aggregation) {
+        LongTerms terms = (LongTerms) aggregation;
+        //获取桶的集合，转化成list<Map<string,object>>
+        return terms.getBuckets().stream().map(bucket -> {
+            //初始化一个map
+            HashMap<String, Object> map = new HashMap<>();
+            //获取桶中的分类id(Key)
+            long id = bucket.getKeyAsNumber().longValue();
+            //根据分类id查询分类名称
+            List<String> names = this.categoryClient.queryNamesByIds(Arrays.asList(id));
+            map.put("id", id);
+            map.put("name", names.get(0));
+            return map;
+        }).collect(Collectors.toList());
     }
 }
