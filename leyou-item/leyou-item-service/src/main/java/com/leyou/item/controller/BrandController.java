@@ -22,6 +22,7 @@ import java.util.List;
  * @Version V1.0
  **/
 @Controller
+@RestController
 @RequestMapping("brand")
 public class BrandController {
     @Autowired
